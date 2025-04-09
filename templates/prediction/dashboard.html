@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard de Predicciones{% endblock %}
+
+{% block content %}
+  <div class="mb-4">
+    <h2 class="mb-3">📊 Dashboard de Predicción de Alzheimer</h2>
+    <p class="lead">Visualización general del sistema</p>
+  </div>
+
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm border-primary text-center">
+        <div class="card-body">
+          <h5 class="card-title">🔢 Total de predicciones</h5>
+          <p class="display-6 fw-bold text-primary">{{ total_predictions }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">🧠 Distribución de niveles de riesgo</h5>
+          <img src="data:image/png;base64,{{ graphic1 }}" class="img-fluid" alt="Gráfico de riesgos">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">📈 Predicciones por fecha</h5>
+          <img src="data:image/png;base64,{{ graphic2 }}" class="img-fluid" alt="Gráfico de predicciones por fecha">
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

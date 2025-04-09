@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Predicciones de {{ patient.name }}{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📊 Predicciones para {{ patient.name }}</h2>
+    <a href="{% url 'patients:list_patients' %}" class="btn btn-outline-secondary">⬅️ Volver a pacientes</a>
+  </div>
+
+  {% if predictions %}
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Fecha</th>
+          <th>Nivel de riesgo</th>
+          <th>Confianza del modelo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in predictions %}
+          <tr>
+            <td>{{ p.date_predicted|date:"d/m/Y H:i" }}</td>
+            <td>{{ p.get_risk_level_display }}</td>
+            <td>{{ p.confidence_score|floatformat:2 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <div class="alert alert-warning">Este paciente aún no tiene predicciones registradas.</div>
+  {% endif %}
+{% endblock %}

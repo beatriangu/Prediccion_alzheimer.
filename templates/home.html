@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+  <div class="text-center mb-4">
+    <h2 class="mb-3">🧠 Bienvenida al Proyecto de Predicción de Alzheimer</h2>
+    <p class="lead">Selecciona una acción para comenzar:</p>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">🎮 Jugar</h5>
+          <p class="card-text">Accede a los juegos cognitivos disponibles.</p>
+          <a href="{% url 'games:game_list' %}" class="btn btn-primary">Ir a Juegos</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">🧑 Registrar Paciente</h5>
+          <p class="card-text">Añade un nuevo paciente al sistema.</p>
+          <a href="{% url 'patients:create_patient' %}" class="btn btn-success">Registrar</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">📊 Dashboard</h5>
+          <p class="card-text">Visualiza métricas y evolución del sistema.</p>
+          <a href="{% url 'predictions:dashboard' %}" class="btn btn-dark">Ver Dashboard</a>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-3">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">🧠 Predicciones</h5>
+          <p class="card-text">Consulta los resultados desde el panel de administración.</p>
+          <a href="/admin/" class="btn btn-secondary">Ir al Admin</a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

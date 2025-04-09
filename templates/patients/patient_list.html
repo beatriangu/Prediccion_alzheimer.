@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Lista de Pacientes{% endblock %}
+
+{% block content %}
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">👥 Pacientes registrados</h2>
+    <a href="{% url 'patients:create_patient' %}" class="btn btn-success">➕ Nuevo paciente</a>
+  </div>
+
+  {% if patients %}
+    <div class="table-responsive">
+      <table class="table table-striped table-hover align-middle">
+        <thead class="table-primary">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Edad</th>
+            <th scope="col">Sexo</th>
+            <th scope="col">Educación</th>
+            <th scope="col">Ocupación</th>
+            <th scope="col" class="text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for patient in patients %}
+            <tr>
+              <td>{{ patient.id_patient }}</td>
+              <td>{{ patient.name }}</td>
+              <td>{{ patient.age }}</td>
+              <td>{{ patient.get_gender_display }}</td>
+              <td>{{ patient.get_education_level_display }}</td>
+              <td>{{ patient.occupation|default:"-" }}</td>
+              <td class="text-center">
+                <a href="{% url 'patients:patient_predictions' patient.id_patient %}" class="btn btn-sm btn-outline-primary">
+                  🔍 Ver predicciones
+                </a>
+                <a href="{% url 'patients:patient_game_results' patient.id_patient %}" class="btn btn-sm btn-outline-secondary">
+                  🎮 Resultados de juegos
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      No hay pacientes registrados todavía.
+    </div>
+  {% endif %}
+{% endblock %}
+

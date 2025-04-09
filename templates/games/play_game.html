@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Jugar: {{ game.name }}{% endblock %}
+
+{% block content %}
+  <div class="mb-4">
+    <h2 class="mb-3">🧩 Jugar: {{ game.name }}</h2>
+    <p><strong>Área cognitiva:</strong> {{ game.get_cognitive_area_display }}</p>
+    <p class="text-muted">{{ game.description }}</p>
+    <hr>
+  </div>
+
+  <form method="post" class="bg-light p-4 rounded shadow-sm">
+    {% csrf_token %}
+    <div class="mb-3">
+      {{ form.non_field_errors }}
+    </div>
+    {% for field in form %}
+      <div class="mb-3">
+        <label class="form-label">{{ field.label_tag }}</label>
+        {{ field }}
+        {% if field.errors %}
+          <div class="text-danger">{{ field.errors }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-primary">💾 Guardar resultado</button>
+    <a href="{% url 'games:game_list' %}" class="btn btn-secondary ms-2">⬅️ Volver a juegos</a>
+  </form>
+{% endblock %}
