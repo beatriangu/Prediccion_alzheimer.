@@ -9,20 +9,42 @@
   </div>
 
   {% if predictions %}
-    <table class="table table-bordered table-hover">
+    <table class="table table-striped table-hover align-middle">
       <thead class="table-light">
         <tr>
           <th>Fecha</th>
           <th>Nivel de riesgo</th>
-          <th>Confianza del modelo</th>
+          <th>Confianza</th>
         </tr>
       </thead>
       <tbody>
         {% for p in predictions %}
           <tr>
             <td>{{ p.date_predicted|date:"d/m/Y H:i" }}</td>
-            <td>{{ p.get_risk_level_display }}</td>
-            <td>{{ p.confidence_score|floatformat:2 }}</td>
+            <td>
+              {% if p.risk_level == "bajo" %}
+                <span class="badge bg-success">Bajo</span>
+              {% elif p.risk_level == "medio" %}
+                <span class="badge bg-warning text-dark">Medio</span>
+              {% elif p.risk_level == "alto" %}
+                <span class="badge bg-danger">Alto</span>
+              {% else %}
+                {{ p.get_risk_level_display }}
+              {% endif %}
+            </td>
+            <td>
+              {% with confianza=p.confidence_score|floatformat:0 %}
+                <span class="badge
+                  {% if confianza|add:'0' >= 85 %}
+                    bg-success
+                  {% elif confianza|add:'0' >= 60 %}
+                    bg-warning text-dark
+                  {% else %}
+                    bg-danger
+                  {% endif %}
+                ">{{ confianza }}%</span>
+              {% endwith %}
+            </td>
           </tr>
         {% endfor %}
       </tbody>
@@ -31,3 +53,4 @@
     <div class="alert alert-warning">Este paciente aún no tiene predicciones registradas.</div>
   {% endif %}
 {% endblock %}
+

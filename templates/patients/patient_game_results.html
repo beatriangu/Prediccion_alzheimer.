@@ -24,7 +24,16 @@
           <tr>
             <td>{{ result.game.name }}</td>
             <td>{{ result.date_played|date:"d/m/Y H:i" }}</td>
-            <td>{{ result.score }}</td>
+            <td>
+              {% if result.score >= 8 %}
+                <span class="badge bg-success">{{ result.score }}</span>
+              {% elif result.score >= 5 %}
+                <span class="badge bg-warning text-dark">{{ result.score }}</span>
+              {% else %}
+                <span class="badge bg-danger">{{ result.score }}</span>
+              {% endif %}
+            </td>
+            
             <td>{{ result.errors }}</td>
             <td>{{ result.time_spent }}</td>
           </tr>

@@ -6,6 +6,7 @@
   <div class="mb-4">
     <h2 class="mb-3">🔍 Predicción para {{ prediction.patient.name }}</h2>
     <div class="row mb-3">
+      <!-- Nivel de riesgo -->
       <div class="col-md-4">
         <div class="card border-primary shadow-sm">
           <div class="card-body">
@@ -14,22 +15,36 @@
           </div>
         </div>
       </div>
+
+      <!-- Confianza del modelo -->
       <div class="col-md-4">
         <div class="card border-success shadow-sm">
           <div class="card-body">
-            <h5 class="card-title text-success">📈 Confianza del modelo</h5>
+            <h5 class="card-title">📈 Confianza del modelo</h5>
             <p class="card-text mb-2"><strong>{{ prediction.confidence_score|floatformat:2 }}</strong></p>
-            <div class="progress" style="height: 20px;">
-              <div class="progress-bar bg-success" role="progressbar"
-                   style="width: {{ prediction.confidence_score|floatformat:2|floatformat:0 }}%;" 
-                   aria-valuenow="{{ prediction.confidence_score|floatformat:2|floatformat:0 }}" 
-                   aria-valuemin="0" aria-valuemax="1">
-                {{ prediction.confidence_score|floatformat:0 }}%
+
+            {% with confianza=prediction.confidence_score|floatformat:0 %}
+              <div class="progress" style="height: 20px;">
+                <div class="progress-bar 
+                  {% if confianza|add:'0' >= 85 %}
+                    bg-success
+                  {% elif confianza|add:'0' >= 60 %}
+                    bg-warning text-dark
+                  {% else %}
+                    bg-danger
+                  {% endif %}"
+                  role="progressbar"
+                  style="width: {{ confianza }}%;"
+                  aria-valuenow="{{ confianza }}" aria-valuemin="0" aria-valuemax="100">
+                  {{ confianza }}%
+                </div>
               </div>
-            </div>
+            {% endwith %}
           </div>
         </div>
       </div>
+
+      <!-- Fecha de predicción -->
       <div class="col-md-4">
         <div class="card border-secondary shadow-sm">
           <div class="card-body">
@@ -43,6 +58,7 @@
 
   <hr class="my-4">
 
+  <!-- Recomendaciones -->
   <h3 class="mb-3">📋 Recomendaciones personalizadas</h3>
   {% if prediction.recommendations.all %}
     <div class="list-group">
@@ -61,6 +77,20 @@
       No hay recomendaciones disponibles aún.
     </div>
   {% endif %}
+
+  <!-- Enlaces a historial -->
+  <div class="mt-4 d-flex justify-content-center gap-3">
+    <a href="{% url 'patients:patient_predictions' prediction.patient.id_patient %}" class="btn btn-outline-primary">
+      📋 Ver historial de predicciones
+    </a>
+    <a href="{% url 'patients:patient_game_results' prediction.patient.id_patient %}" class="btn btn-outline-secondary">
+      🎮 Ver resultados de juegos
+    </a>
+  </div>
 {% endblock %}
+
+
+
+
 
 
