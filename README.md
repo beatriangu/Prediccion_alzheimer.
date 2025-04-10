@@ -1,78 +1,109 @@
-# 🧠 Predicción del Alzheimer mediante un Juego Interactivo
+# 🧠 Predicción de Alzheimer mediante Juegos Interactivos
 
-Este proyecto es una plataforma desarrollada con Django que busca detectar patrones cognitivos asociados al Alzheimer mediante la interacción del usuario con mini-juegos. Combina tecnología, ciencia y participación ciudadana para construir un sistema predictivo y adaptativo.
+Este proyecto es una aplicación web construida con Django que permite predecir el nivel de riesgo de Alzheimer en pacientes, utilizando resultados de juegos cognitivos interactivos. Además, genera recomendaciones automáticas personalizadas basadas en el resultado de cada predicción.
 
----
+## 🚀 Funcionalidades
 
-## 🎯 Objetivo
+- Registro y gestión de pacientes
+- Juegos clasificados por áreas cognitivas (memoria, atención, etc.)
+- Registro de resultados por juego (puntuación, errores, tiempo)
+- Generación de predicciones automáticas con modelo de Machine Learning
+- Visualización de gráficas interactivas en el dashboard
+- Exportación a CSV de predicciones y resultados
+- Sistema AJAX para filtros en tiempo real
+- Panel de administración completo y visual
 
-Diseñar una aplicación accesible y entretenida que permita a los usuarios:
-- Realizar mini-juegos que evalúan funciones cognitivas clave
-- Recoger métricas de tiempo de reacción, precisión, memoria, etc.
-- Generar una predicción del riesgo de Alzheimer (modelo ML)
-- Ofrecer recomendaciones personalizadas en base a los resultados
-- Contribuir de forma anónima a la investigación científica
+## 📊 Dashboard
 
----
+El sistema cuenta con un dashboard que incluye:
 
-## 🧩 Componentes principales
+- Total de predicciones realizadas
+- Última predicción y último paciente registrado
+- Gráficas de:
+  - Distribución de niveles de riesgo
+  - Evolución de predicciones por fecha
+- Filtros por paciente y fecha
+- Tabla dinámica con botón de exportar resultados filtrados
 
-### 1. Módulo de juegos interactivos
-- Juegos de memoria visual, atención, lógica y lenguaje
-- Registro automático del rendimiento y evolución
+## 🧠 Modelo Predictivo
 
-### 2. Módulo de perfil de usuario
-- Registro de datos personales relevantes (edad, antecedentes, etc.)
-- Historial de juegos y predicciones anteriores
+- Entrenado en `scikit-learn`
+- Se guarda como `.pkl` y se carga con `joblib`
+- Predice el nivel de riesgo (`bajo`, `medio`, `alto`)
+- Devuelve también la probabilidad/confianza
 
-### 3. Módulo de predicción
-- Aplicación de un modelo de Machine Learning entrenado con métricas cognitivas
-- Probabilidad estimada de deterioro cognitivo
+## 💡 Recomendaciones automáticas
 
-### 4. Módulo de recomendaciones
-- Sugerencias personalizadas (alimentación, estimulación cognitiva, hábitos)
-- Seguimiento de progreso y evolución
+Después de cada predicción, el sistema genera automáticamente una serie de recomendaciones adaptadas al nivel de riesgo del paciente (ejercicio cognitivo, alimentación, estilo de vida...).
 
----
+## 🛠️ Tecnologías utilizadas
 
-## ⚙️ Tecnologías utilizadas
+- Python 3.13
+- Django 4+
+- SQLite (puede migrarse a PostgreSQL fácilmente)
+- Matplotlib (para gráficos embebidos)
+- Bootstrap (para interfaz)
+- Faker (para generar datos de prueba)
+- AJAX y JavaScript para filtros dinámicos
 
-- **Backend**: Python + Django
-- **Frontend**: HTML5, CSS3, JavaScript
-- **Base de datos**: SQLite (fase inicial), PostgreSQL (opcional)
-- **ML**: scikit-learn (modelo simple)
-- **Gráficos**: Chart.js
-- **Admin y pruebas**: Django Admin, Django Test
+## 🧪 Instalación
 
----
+```bash
+# Clonar el repositorio
+git clone https://github.com/beatrizlamiquiz/prediccion-alzheimer.git
+cd prediccion-alzheimer
 
-## 🚀 Estado del proyecto
+# Crear y activar entorno virtual
+python3 -m venv venv
+source venv/bin/activate
 
-- [x] Estructura base del proyecto Django
-- [x] App `core` creada y registrada
-- [ ] Modelos definidos: UsuarioPaciente, ResultadoMiniJuego, Predicción
-- [ ] Mini-juegos en desarrollo (JS o framework)
-- [ ] Carga de datos y entrenamiento del modelo
-- [ ] Visualización y feedback personalizado
+# Instalar dependencias
+pip install -r requirements.txt
 
----
+# Crear la base de datos
+python manage.py migrate
 
-## 🧪 ¿De dónde salen los datos?
+# Crear superusuario
+python manage.py createsuperuser
 
-1. **Inicialmente**: Carga manual desde el panel de administración para testear la lógica
-2. **Posteriormente**:
-   - Datos recolectados desde los juegos
-   - Datos de prueba generados con Faker
-   - Dataset público para entrenamiento de modelo (como ADNI, OASIS, o similares adaptados)
+# Ejecutar el servidor
+python manage.py runserver
 
----
+                model_path = os.path.join(settings.BASE_DIR, 'prediction', 'modelos', 'modelo_alzheimer.pkl')
+                encoder_path = os.path.join(settings.BASE_DIR, 'prediction', 'modelos', 'label_encoder.pkl')
+                model = joblib.load(model_path)
+                encoder = joblib.load(encoder_path)
 
-## 👩‍💻 Desarrollado por
+                # Preparar los datos para predecir
+                X = [[result.score, result.errors, result.time_spent]]
+                y_pred = model.predict(X)
+                y_proba = model.predict_proba(X)
 
-Beatriz Lamiquiz  
-Proyecto final del curso  
-**Certificado de Formación Avanzada Backend: Python, Flask y Django**  
-Fundae + IBM
+                nivel_riesgo = encoder.inverse_transform(y_pred)[0]
+                confianza = max(y_proba[0])  # mayor probabilidad
+
+                # Crear predicción en la base de datos
+                prediction = Prediction.objects.create(
+                    patient=result.patient,
+                    risk_level=nivel_riesgo,
+                    confidence_score=round(confianza, 2)
+                )
+
+                # 🧠 Generar recomendaciones automáticamente
+                generar_recomendaciones_automaticas(prediction)
+
+                # ✅ Redirige correctamente a la vista detallada
+                return redirect('predictions:prediction_result', pk=prediction.id)
+
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al generar la predicción: {e}")
+                return redirect('games:game_list')
+
+    else:
+        form = GameResultForm()
+
+    return render(request, 'games/play_game.html', {'form': form, 'game': game})
+
 
 ---
 
