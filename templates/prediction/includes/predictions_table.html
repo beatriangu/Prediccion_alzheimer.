@@ -1,0 +1,41 @@
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th>Paciente</th>
+      <th>Riesgo</th>
+      <th>Confianza</th>
+      <th>Fecha</th>
+      <th></th> <!-- Columna para el botón -->
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in predictions %}
+      <tr>
+        <td>{{ p.patient.name }}</td>
+        <td>
+          {% if p.risk_level == 'bajo' %}
+            <span class="badge bg-success">Bajo</span>
+          {% elif p.risk_level == 'medio' %}
+            <span class="badge bg-warning text-dark">Medio</span>
+          {% elif p.risk_level == 'alto' %}
+            <span class="badge bg-danger">Alto</span>
+          {% else %}
+            {{ p.get_risk_level_display }}
+          {% endif %}
+        </td>
+        <td>{{ p.confidence_score|floatformat:2 }}</td>
+        <td>{{ p.date_predicted|date:"d/m/Y H:i" }}</td>
+        <td class="text-end">
+          <a href="{% url 'predictions:prediction_result' p.id %}" class="btn btn-sm btn-outline-primary">
+            🔍 Ver detalle
+          </a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="5" class="text-center text-muted">No hay predicciones que coincidan.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+  

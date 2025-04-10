@@ -3,13 +3,13 @@
 {% block title %}Dashboard de Predicciones{% endblock %}
 
 {% block content %}
-  <div class="mb-4 text-center">
+  <div class="mb-5 text-center">
     <h2 class="mb-3">📊 Dashboard de Predicción de Alzheimer</h2>
     <p class="lead">Visualización general del sistema y evolución de predicciones.</p>
 
-    <!-- Botón exportar CSV -->
-    <a href="{% url 'predictions:export_predictions_csv' %}" class="btn btn-outline-success mt-2">
-      📥 Exportar predicciones a CSV
+    <!-- Botón exportar TODO -->
+    <a href="{% url 'predictions:export_predictions_csv' %}" class="btn btn-outline-success mt-3">
+      📥 Exportar todas las predicciones a CSV
     </a>
   </div>
 
@@ -33,7 +33,7 @@
           <h5 class="card-title">🧠 Última predicción realizada</h5>
           {% if latest_prediction %}
             <p class="fw-bold mb-1">{{ latest_prediction.patient.name }}</p>
-            <p class="mb-1">
+            <p class="mb-2">
               {% if latest_prediction.risk_level == 'bajo' %}
                 <span class="badge bg-success">Bajo</span>
               {% elif latest_prediction.risk_level == 'medio' %}
@@ -44,7 +44,7 @@
                 {{ latest_prediction.get_risk_level_display }}
               {% endif %}
             </p>
-            <p class="text-muted small">Realizada el {{ latest_prediction.date_predicted|date:"d/m/Y H:i" }}</p>
+            <p class="text-muted small">Fecha: {{ latest_prediction.date_predicted|date:"d/m/Y H:i" }}</p>
           {% else %}
             <p class="text-muted">Aún no hay predicciones registradas.</p>
           {% endif %}
@@ -54,7 +54,7 @@
   </div>
 
   <!-- Último paciente registrado -->
-  <div class="row mb-4 justify-content-center">
+  <div class="row mb-5 justify-content-center">
     <div class="col-md-6">
       <div class="card border-info shadow-sm">
         <div class="card-body text-center">
@@ -73,8 +73,8 @@
   <!-- Gráficos -->
   <div class="row">
     <div class="col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
           <h5 class="card-title">🧠 Distribución de niveles de riesgo</h5>
           <img src="data:image/png;base64,{{ graphic1 }}" class="img-fluid rounded" alt="Gráfico de riesgos">
         </div>
@@ -82,14 +82,66 @@
     </div>
 
     <div class="col-md-6 mb-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
+      <div class="card shadow-sm h-100">
+        <div class="card-body text-center">
           <h5 class="card-title">📈 Predicciones por fecha</h5>
           <img src="data:image/png;base64,{{ graphic2 }}" class="img-fluid rounded" alt="Gráfico de predicciones por fecha">
         </div>
       </div>
     </div>
   </div>
+
+  <!-- Historial de predicciones filtrable -->
+  <div class="row mt-5">
+    <div class="col">
+      <h4 class="mb-3">📄 Historial de predicciones</h4>
+
+      <form id="filter-form" class="row g-3 mb-3">
+        <div class="col-md-4">
+          <label for="patient_id" class="form-label">Paciente</label>
+          <select class="form-select" id="patient_id" name="patient_id">
+            <option value="">Todos</option>
+            {% for patient in patients %}
+              <option value="{{ patient.id_patient }}">{{ patient.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Desde</label>
+          <input type="date" name="start_date" class="form-control">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Hasta</label>
+          <input type="date" name="end_date" class="form-control">
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-primary w-100">🔍 Filtrar</button>
+        </div>
+      </form>
+
+      <div class="mb-3 text-end">
+        <a id="export-csv-link" href="#" class="btn btn-outline-secondary">📤 Exportar resultados filtrados</a>
+      </div>
+
+      <div id="predictions-table">
+        {% include 'prediction/includes/predictions_table.html' with predictions=None %}
+      </div>
+    </div>
+  </div>
+
+  <!-- AJAX script -->
+  <script>
+    document.getElementById('filter-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const params = new URLSearchParams(new FormData(form)).toString();
+
+      fetch("{% url 'predictions:filtered_predictions_ajax' %}?" + params)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('predictions-table').innerHTML = data.html;
+          document.getElementById('export-csv-link').href = "{% url 'predictions:export_predictions_csv' %}?" + params;
+        });
+    });
+  </script>
 {% endblock %}
-
-

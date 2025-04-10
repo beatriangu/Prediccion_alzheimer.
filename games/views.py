@@ -1,7 +1,9 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.conf import settings
 from django.contrib import messages
+from django.http import HttpResponse
 import os
+import csv
 import joblib
 
 from .models import Game, GameResult
@@ -55,7 +57,8 @@ def play_game(request, game_id):
                 # 🧠 Generar recomendaciones automáticamente
                 generar_recomendaciones_automaticas(prediction)
 
-                return redirect('predictions:show_result', prediction_id=prediction.id)
+                # ✅ Redirige correctamente a la vista detallada
+                return redirect('predictions:prediction_result', pk=prediction.id)
 
             except Exception as e:
                 messages.error(request, f"Ocurrió un error al generar la predicción: {e}")
@@ -65,3 +68,27 @@ def play_game(request, game_id):
         form = GameResultForm()
 
     return render(request, 'games/play_game.html', {'form': form, 'game': game})
+
+
+def export_game_results_csv(request):
+    """
+    Exporta todos los resultados de juegos como archivo CSV.
+    Se puede usar desde el admin o desde una URL pública.
+    """
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="resultados_juegos.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Paciente', 'Juego', 'Puntuación', 'Tiempo (s)', 'Errores', 'Fecha'])
+
+    for result in GameResult.objects.all().order_by('-date_played'):
+        writer.writerow([
+            result.patient.name,
+            result.game.name,
+            result.score,
+            result.time_spent,
+            result.errors,
+            result.date_played.strftime("%d/%m/%Y %H:%M")
+        ])
+
+    return response
