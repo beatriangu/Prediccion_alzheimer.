@@ -2,6 +2,10 @@
 
 Este proyecto es una aplicación web construida con Django que permite predecir el nivel de riesgo de Alzheimer en pacientes, utilizando resultados de juegos cognitivos interactivos. Además, genera recomendaciones automáticas personalizadas basadas en el resultado de cada predicción.
 
+<img src="images/dashboard_general.png" alt="Dashboard de predicción" width="800"/>
+
+---
+
 ## 🚀 Funcionalidades
 
 - Registro y gestión de pacientes
@@ -13,42 +17,93 @@ Este proyecto es una aplicación web construida con Django que permite predecir 
 - Sistema AJAX para filtros en tiempo real
 - Panel de administración completo y visual
 
+---
+
 ## 📊 Dashboard
 
 El sistema cuenta con un dashboard que incluye:
 
 - Total de predicciones realizadas
 - Última predicción y último paciente registrado
-- Gráficas de:
-  - Distribución de niveles de riesgo
-  - Evolución de predicciones por fecha
-- Filtros por paciente y fecha
-- Tabla dinámica con botón de exportar resultados filtrados
 
-## 🧠 Modelo Predictivo
+### Distribución de niveles de riesgo
 
-- Entrenado en `scikit-learn`
-- Se guarda como `.pkl` y se carga con `joblib`
-- Predice el nivel de riesgo (`bajo`, `medio`, `alto`)
-- Devuelve también la probabilidad/confianza
+<img src="images/grafico_riesgo.png" alt="Distribución de riesgo" width="500"/>
 
-## 💡 Recomendaciones automáticas
+### Evolución de predicciones por fecha
 
-Después de cada predicción, el sistema genera automáticamente una serie de recomendaciones adaptadas al nivel de riesgo del paciente (ejercicio cognitivo, alimentación, estilo de vida...).
+<img src="images/grafico_fecha.png" alt="Evolución de predicciones" width="500"/>
 
-## 🛠️ Tecnologías utilizadas
+### Filtros por paciente y exportación a CSV
 
-- Python 3.13
-- Django 4+
-- SQLite (puede migrarse a PostgreSQL fácilmente)
-- Matplotlib (para gráficos embebidos)
-- Bootstrap (para interfaz)
-- Faker (para generar datos de prueba)
-- AJAX y JavaScript para filtros dinámicos
+<img src="images/filtros_ajax.png" alt="Filtros dinámicos AJAX" width="700"/>
 
-## 🧪 Instalación
+---
 
-```bash
+## 🧾 Detalle de una predicción
+
+<img src="images/detalle_prediccion.png" alt="Detalle de predicción con recomendaciones" width="700"/>
+
+---
+
+## 🎮 Juegos cognitivos
+
+<img src="images/listado_juegos.png" alt="Listado de juegos" width="700"/>
+
+---
+
+## ⚙️ Administración desde Django
+
+<img src="images/admin_panel.png" alt="Panel de administración Django" width="700"/>
+
+---
+
+## 🧠 Cómo funciona el modelo de predicción
+
+El sistema utiliza un modelo de tipo **Random Forest**, una técnica basada en árboles de decisión combinados para mejorar la precisión y evitar el sobreajuste.
+
+📥 Entradas:
+- Puntuación del juego (`score`)
+- Errores cometidos (`errores`)
+- Tiempo empleado (`tiempo`)
+
+📤 Salida:
+- Nivel de riesgo: `bajo`, `medio` o `alto`
+
+El modelo está entrenado con `scikit-learn`, codificado con `LabelEncoder` y guardado en formato `.pkl` con `joblib`.
+
+```python
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+✅ Tras cada juego, se realiza una predicción con estos datos y se genera automáticamente una recomendación personalizada para el paciente.
+
+💡 Recomendaciones automáticas
+El sistema genera automáticamente sugerencias en función del nivel de riesgo:
+
+🧠 Actividades cognitivas
+
+🥦 Estilo de vida saludable
+
+📅 Seguimiento médico
+
+🛠️ Tecnologías utilizadas
+Python 3.13
+
+Django 4+
+
+SQLite (fácil de migrar a PostgreSQL)
+
+scikit-learn + joblib (modelo predictivo)
+
+Matplotlib (gráficos embebidos)
+
+Faker (datos de prueba)
+
+Bootstrap 5 + AJAX (interfaz moderna)
+
+🧪 Instalación
+bash
+Copiar código
 # Clonar el repositorio
 git clone https://github.com/beatrizlamiquiz/prediccion-alzheimer.git
 cd prediccion-alzheimer
@@ -60,53 +115,18 @@ source venv/bin/activate
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Crear la base de datos
+# Migrar la base de datos
 python manage.py migrate
 
 # Crear superusuario
 python manage.py createsuperuser
 
-# Ejecutar el servidor
+# Ejecutar servidor
 python manage.py runserver
+🔒 Aviso legal
+Esta aplicación es solo con fines educativos y de investigación.
+No reemplaza diagnóstico clínico ni asesoramiento médico.
+Se prohíbe su uso con fines terapéuticos sin validación científica adecuada.
 
-                model_path = os.path.join(settings.BASE_DIR, 'prediction', 'modelos', 'modelo_alzheimer.pkl')
-                encoder_path = os.path.join(settings.BASE_DIR, 'prediction', 'modelos', 'label_encoder.pkl')
-                model = joblib.load(model_path)
-                encoder = joblib.load(encoder_path)
-
-                # Preparar los datos para predecir
-                X = [[result.score, result.errors, result.time_spent]]
-                y_pred = model.predict(X)
-                y_proba = model.predict_proba(X)
-
-                nivel_riesgo = encoder.inverse_transform(y_pred)[0]
-                confianza = max(y_proba[0])  # mayor probabilidad
-
-                # Crear predicción en la base de datos
-                prediction = Prediction.objects.create(
-                    patient=result.patient,
-                    risk_level=nivel_riesgo,
-                    confidence_score=round(confianza, 2)
-                )
-
-                # 🧠 Generar recomendaciones automáticamente
-                generar_recomendaciones_automaticas(prediction)
-
-                # ✅ Redirige correctamente a la vista detallada
-                return redirect('predictions:prediction_result', pk=prediction.id)
-
-            except Exception as e:
-                messages.error(request, f"Ocurrió un error al generar la predicción: {e}")
-                return redirect('games:game_list')
-
-    else:
-        form = GameResultForm()
-
-    return render(request, 'games/play_game.html', {'form': form, 'game': game})
-
-
----
-
-## 🔒 Aviso legal
-
-Esta aplicación es solo con fines educativos y de investigación. No reemplaza diagnóstico clínico ni asesoramiento médico. Se prohíbe su uso con fines terapéuticos sin validación científica adecuada.
+👩‍💻 Autora
+Desarrollado por Beatriz Lamiquiz
