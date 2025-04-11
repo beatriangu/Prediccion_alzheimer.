@@ -1,3 +1,5 @@
+![Banner del proyecto](images/banner.webp)
+
 # 🧠 Predicción de Alzheimer mediante Juegos Interactivos
 
 Este proyecto es una aplicación web construida con Django que permite predecir el nivel de riesgo de Alzheimer en pacientes, utilizando resultados de juegos cognitivos interactivos. Además, genera recomendaciones automáticas personalizadas basadas en el resultado de cada predicción.
