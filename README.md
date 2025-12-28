@@ -2,47 +2,64 @@
 
 # 🧠 Predicción de Alzheimer mediante Juegos Interactivos
 
-Este proyecto es una aplicación web construida con Django que permite predecir el nivel de riesgo de Alzheimer en pacientes, utilizando resultados de juegos cognitivos interactivos. Además, genera recomendaciones automáticas personalizadas basadas en el resultado de cada predicción.
+Aplicación web desarrollada con **Django** orientada a la **detección temprana del riesgo de Alzheimer** mediante juegos cognitivos interactivos.  
+El sistema recoge métricas de rendimiento cognitivo, genera **predicciones automáticas** con Machine Learning y ofrece **recomendaciones personalizadas** orientadas al seguimiento y la prevención.
 
-<img src="images/dashboard_general.png" alt="Dashboard de predicción" width="800"/>
+> ⚠️ **Proyecto educativo y de investigación. No constituye un diagnóstico clínico.**
 
 ---
 
-## 🚀 Funcionalidades
+## 🎯 Objetivo del proyecto
+
+Explorar cómo la **gamificación cognitiva**, combinada con **análisis de datos y modelos predictivos**, puede servir como herramienta de apoyo para:
+- Identificar patrones de riesgo
+- Facilitar el seguimiento cognitivo
+- Traducir datos complejos en información comprensible para profesionales y usuarios
+
+---
+
+## 🚀 Funcionalidades principales
 
 - Registro y gestión de pacientes
-- Juegos clasificados por áreas cognitivas (memoria, atención, etc.)
-- Registro de resultados por juego (puntuación, errores, tiempo)
-- Generación de predicciones automáticas con modelo de Machine Learning
-- Visualización de gráficas interactivas en el dashboard
-- Exportación a CSV de predicciones y resultados
-- Sistema AJAX para filtros en tiempo real
-- Panel de administración completo y visual
+- Juegos cognitivos clasificados por áreas (memoria, atención, velocidad de procesamiento…)
+- Registro detallado de resultados:
+  - Puntuación
+  - Errores
+  - Tiempo de ejecución
+- Generación automática de predicciones de riesgo
+- Recomendaciones personalizadas según el resultado
+- Dashboard interactivo con métricas clave
+- Filtros dinámicos con AJAX
+- Exportación de datos a CSV
+- Panel de administración completo con Django Admin
 
 ---
 
-## 📊 Dashboard
+## 📊 Dashboard de análisis
 
-El sistema cuenta con un dashboard que incluye:
+El dashboard centraliza la información relevante para el seguimiento:
 
 - Total de predicciones realizadas
-- Última predicción y último paciente registrado
+- Última predicción registrada
+- Último paciente incorporado
 
 ### Distribución de niveles de riesgo
-
 <img src="images/grafico_riesgo.png" alt="Distribución de riesgo" width="500"/>
 
-### Evolución de predicciones por fecha
+### Evolución de predicciones en el tiempo
+<img src="images/grafico_fecha.png" alt="Evolución temporal de predicciones" width="500"/>
 
-<img src="images/grafico_fecha.png" alt="Evolución de predicciones" width="500"/>
-
-### Filtros por paciente y exportación a CSV
-
-<img src="images/filtros_ajax.png" alt="Filtros dinámicos AJAX" width="700"/>
+### Filtros dinámicos y exportación
+<img src="images/filtros_ajax.png" alt="Filtros AJAX y exportación" width="700"/>
 
 ---
 
 ## 🧾 Detalle de una predicción
+
+Cada predicción muestra:
+- Nivel de riesgo estimado
+- Variables analizadas
+- Recomendaciones automáticas personalizadas
 
 <img src="images/detalle_prediccion.png" alt="Detalle de predicción con recomendaciones" width="700"/>
 
@@ -50,85 +67,42 @@ El sistema cuenta con un dashboard que incluye:
 
 ## 🎮 Juegos cognitivos
 
-<img src="images/listado_juegos.png" alt="Listado de juegos" width="700"/>
+Los juegos están diseñados para evaluar distintas capacidades cognitivas y generar datos estructurados para el modelo predictivo.
+
+<img src="images/listado_juegos.png" alt="Listado de juegos cognitivos" width="700"/>
 
 ---
 
-## ⚙️ Administración desde Django
+## ⚙️ Administración con Django
+
+Gestión completa de pacientes, juegos, resultados y predicciones desde el panel de administración.
 
 <img src="images/admin_panel.png" alt="Panel de administración Django" width="700"/>
 
 ---
 
-## 🧠 Cómo funciona el modelo de predicción
+## 🧠 Modelo de predicción
 
-El sistema utiliza un modelo de tipo **Random Forest**, una técnica basada en árboles de decisión combinados para mejorar la precisión y evitar el sobreajuste.
+El sistema utiliza un modelo de **Random Forest**, entrenado para clasificar el nivel de riesgo en tres categorías:
 
-📥 Entradas:
+- `bajo`
+- `medio`
+- `alto`
+
+### Variables de entrada
 - Puntuación del juego (`score`)
-- Errores cometidos (`errores`)
+- Número de errores (`errores`)
 - Tiempo empleado (`tiempo`)
 
-📤 Salida:
-- Nivel de riesgo: `bajo`, `medio` o `alto`
+### Salida
+- Nivel de riesgo cognitivo estimado
 
-El modelo está entrenado con `scikit-learn`, codificado con `LabelEncoder` y guardado en formato `.pkl` con `joblib`.
+### Tecnologías del modelo
+- `scikit-learn`
+- `LabelEncoder`
+- Persistencia con `joblib`
 
 ```python
 model = RandomForestClassifier(n_estimators=100, random_state=42)
 model.fit(X_train, y_train)
-✅ Tras cada juego, se realiza una predicción con estos datos y se genera automáticamente una recomendación personalizada para el paciente.
 
-💡 Recomendaciones automáticas
-El sistema genera automáticamente sugerencias en función del nivel de riesgo:
-
-🧠 Actividades cognitivas
-
-🥦 Estilo de vida saludable
-
-📅 Seguimiento médico
-
-🛠️ Tecnologías utilizadas
-Python 3.13
-
-Django 4+
-
-SQLite (fácil de migrar a PostgreSQL)
-
-scikit-learn + joblib (modelo predictivo)
-
-Matplotlib (gráficos embebidos)
-
-Faker (datos de prueba)
-
-Bootstrap 5 + AJAX (interfaz moderna)
-
-🧪 Instalación
-bash
-Copiar código
-# Clonar el repositorio
-git clone https://github.com/beatrizlamiquiz/prediccion-alzheimer.git
-cd prediccion-alzheimer
-
-# Crear y activar entorno virtual
-python3 -m venv venv
-source venv/bin/activate
-
-# Instalar dependencias
-pip install -r requirements.txt
-
-# Migrar la base de datos
-python manage.py migrate
-
-# Crear superusuario
-python manage.py createsuperuser
-
-# Ejecutar servidor
-python manage.py runserver
-🔒 Aviso legal
-Esta aplicación es solo con fines educativos y de investigación.
-No reemplaza diagnóstico clínico ni asesoramiento médico.
-Se prohíbe su uso con fines terapéuticos sin validación científica adecuada.
-
-👩‍💻 Autora
-Desarrollado por Beatriz Lamiquiz
